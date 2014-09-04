@@ -1,0 +1,20 @@
+{
+    "name": "dnzm/pdo-veneer",
+    "description": "A thin but shiny veneer around PDO MySQL.",
+    "license": "MIT",
+    "authors": [{
+        "name": "Max Roeleveld",
+        "email": "doenietzomoeilijk@gmail.com"
+    }],
+    "keywords": ["mysql", "pdo"],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/doenietzomoeilijk/pdo-veneer"
+        }
+    ],
+    "require": {
+        "php": ">= 5.4",
+        "ext-pdo_mysql": "*"
+    }
+}
