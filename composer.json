@@ -16,5 +16,10 @@
     "require": {
         "php": ">= 5.4",
         "ext-pdo_mysql": "*"
+    },
+    "autoload": {
+      "psr-4": {
+        "Dnzm\\": "src/"
+      }
     }
 }
