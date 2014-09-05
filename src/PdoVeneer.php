@@ -50,7 +50,6 @@ class PdoVeneer
      */
     public function insert($table, $data)
     {
-        // function body
     }
 
     /**
@@ -63,7 +62,6 @@ class PdoVeneer
      */
     public function update($table, $data, $where = null)
     {
-        // function body
     }
 
     /**
@@ -75,6 +73,5 @@ class PdoVeneer
      */
     public function insertOrUpdate($table, $data)
     {
-        // function body
     }
 }

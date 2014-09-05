@@ -9,9 +9,9 @@
 namespace Dnzm\PdoVeneer;
 
 /**
- * Class Query
+ * Class Querybuilder
  */
-class Query
+class Querybuilder
 {
     /**
      * An array of query parts.
@@ -21,34 +21,40 @@ class Query
     protected $queryParts = array();
 
     /**
-     * @return PdoVeneer\Query $this
+     * @return PdoVeneer\Querybuilder $this
      */
     public function select()
     {
-        // function body
         return $this;
     }
 
     /**
-     * @return PdoVeneer\Query $this
+     * @param string $table name
+     * @param string $alias
+     * @return PdoVeneer\Querybuilder $this
      */
-    public function from()
+    public function from($table, $alias = null)
     {
-        // function body
+        $part = $table;
+        if ($alias !== null) {
+            $part .= " AS $alias";
+        }
+
+        $this->queryParts["from"] = $part;
+
         return $this;
     }
 
     /**
-     * @return PdoVeneer\Query $this
+     * @return PdoVeneer\Querybuilder $this
      */
-    public function where()
+    public function where($where)
     {
-        // function body
         return $this;
     }
 
     /**
-     * @return PdoVeneer\Query $this
+     * @return PdoVeneer\Querybuilder $this
      */
     public function groupBy()
     {

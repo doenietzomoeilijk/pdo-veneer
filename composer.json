@@ -17,9 +17,12 @@
         "php": ">= 5.4",
         "ext-pdo_mysql": "*"
     },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
     "autoload": {
-      "psr-4": {
-        "Dnzm\\": "src/"
-      }
+        "psr-4": {
+            "Dnzm\\": "src/"
+        }
     }
 }
