@@ -32,6 +32,7 @@ class Querybuilder
      * @param string $type one of the keys in the $parts array
      * @param string|array $toAdd string of one or array of alias => field
      * @param string $alias
+     * @return void
      */
     private function addGeneric($type, $toAdd, $alias = null)
     {
@@ -45,6 +46,31 @@ class Querybuilder
             }
 
             $this->parts[$type][] = $toAdd;
+        }
+    }
+
+    /**
+     * Actually add the join.
+     *
+     * @param string $type
+     * @param string|array $toAdd
+     * @param string $joinOn
+     * @return void
+     */
+    private function addGenericJoin($type, $toAdd, $joinOn, $alias = null)
+    {
+        if (is_array($toAdd)) {
+            // This is going to bomb if you feed it the wrong kind of array.
+            // Protip: don't feed it the wrong kind of array.
+            foreach ($toAdd as $key => $value) {
+                $this->addGenericJoin($type, $value, $joinOn, $key);
+            }
+        } else {
+            if ($alias !== null && !is_int($alias)) {
+                $toAdd .= " AS $alias";
+            }
+
+            $this->parts["join"][] = [$type, $toAdd, $joinOn];
         }
     }
 
@@ -90,10 +116,45 @@ class Querybuilder
     }
 
     /**
+     * @param string|array $table
+     * @param string $on
+     * @return Querybuilder $this
+     */
+    public function join($table, $on)
+    {
+        $this->addGenericJoin("", $table, $on);
+        return $this;
+    }
+
+    /**
+     * @param string|array $table
+     * @param string $on
+     * @return Querybuilder $this
+     */
+    public function innerJoin($table, $on)
+    {
+        $this->addGenericJoin("inner", $table, $on);
+        return $this;
+    }
+
+    /**
+     * @param string|array $table
+     * @param string $on
+     * @return Querybuilder $this
+     */
+    public function outerJoin($table, $on)
+    {
+        $this->addGenericJoin("outer", $table, $on);
+        return $this;
+    }
+
+    /**
      * @return PdoVeneer\Querybuilder $this
      */
     public function where($where)
     {
+        // @todo Maybe add a way to add "OR" wheres, too?
+        $this->parts["where"][] = "($where)";
         return $this;
     }
 
@@ -131,6 +192,20 @@ class Querybuilder
 
         if (!empty($this->parts["from"])) {
             $query[] = "FROM " . implode(", ", $this->parts['from']);
+        }
+
+        if (!empty($this->parts["join"])) {
+            foreach ($this->parts["join"] as $join) {
+                list($type, $joinClause, $joinOn) = $join;
+                $type = $type ? strtoupper($type) : "";
+                $query[] = trim("$type JOIN $joinClause ON $joinOn");
+            }
+        }
+
+        if (!empty($this->parts["where"])) {
+
+            $query[] = "WHERE " . implode(" AND ", $this->parts["where"]);
+
         }
 
         return implode(" ", $query);
