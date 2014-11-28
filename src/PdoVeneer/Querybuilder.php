@@ -20,14 +20,54 @@ class Querybuilder
      */
     protected $parts;
 
+    /**
+     * Named parameters go here.
+     * @type array $parameters
+     */
+    protected $parameters;
+
+    /**
+     * Keeps track of how many parameters sans name have been added.
+     * @type integer $parameterCount
+     */
+    protected $parameterCount;
+
     public function __construct()
     {
         $this->reset();
     }
 
     /**
-     * Does the heavy adding-lifting. Yes, you've guessed it right, you can
-     * abuse my laziness to have a query with "limit 10 AS yourmom".o
+     * Reset the query.
+     *
+     * @return Querybuilder $this
+     */
+    public function reset()
+    {
+        $this->parts = [
+            "select" => [],
+            "from" => [],
+            "flags" => [],
+            "join" => [],
+            "where" => [],
+            "orWhere" => [],
+            "group" => [],
+            "having" => [],
+            "order" => [],
+            "limit" => [],
+        ];
+
+        $this->parameters = [];
+        $this->parametercount = 0;
+
+        return $this;
+    }
+
+    /**
+     * Does the heavy adding-lifting.
+     *
+     * Yes, you've guessed it right, you can abuse my laziness to have a query
+     * with "limit 10 AS yourmom".
      *
      * @param string $type one of the keys in the $parts array
      * @param string|array $toAdd string of one or array of alias => field
@@ -72,27 +112,6 @@ class Querybuilder
 
             $this->parts["join"][] = [$type, $toAdd, $joinOn];
         }
-    }
-
-    /**
-     * Reset the query.
-     *
-     * @return Querybuilder $this
-     */
-    public function reset()
-    {
-        $this->parts = [
-            "select" => [],
-            "from" => [],
-            "flags" => [],
-            "join" => [],
-            "where" => [],
-            "group" => [],
-            "having" => [],
-            "order" => [],
-        ];
-
-        return $this;
     }
 
     /**
@@ -149,11 +168,24 @@ class Querybuilder
     }
 
     /**
+     * You can either feed it a straight string, or a string containing
+     * parameters and an array containing the values for those parameters.
+     *
+     * When feeding it an array of parameters, you can specify an associative
+     * array if you use named parameters, or a numeric array if you use simple
+     * questions marks.
+     *
+     * @param string $where
+     * @param array $params
      * @return PdoVeneer\Querybuilder $this
      */
-    public function where($where)
+    public function where($where, array $params = null)
     {
-        // @todo Maybe add a way to add "OR" wheres, too?
+        // @todo: actually use the parameters when running the query!
+        if ($params !== null) {
+            $this->parameters = array_merge($this->parameters, $params);
+        }
+
         $this->parts["where"][] = "($where)";
         return $this;
     }

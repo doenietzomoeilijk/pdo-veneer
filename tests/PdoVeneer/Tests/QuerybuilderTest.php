@@ -46,10 +46,7 @@ class QuerybuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("SELECT * FROM mytable, myothertable", (string) $query);
 
         $query->reset()
-            ->from([
-                "m" => "mytable",
-                "o" => "myothertable",
-            ]);
+            ->from(["m" => "mytable", "o" => "myothertable"]);
         $this->assertEquals("SELECT * FROM mytable AS m, myothertable AS o", (string) $query);
     }
 
@@ -101,6 +98,20 @@ class QuerybuilderTest extends \PHPUnit_Framework_TestCase
         $query->where("mycol IS NOT NULL");
         $this->assertEquals(
             "SELECT * FROM mytable WHERE (1) AND (mycol IS NOT NULL)",
+            (string) $query
+        );
+
+        $query->where("mycol = ?", [1]);
+        $this->assertEquals(
+            "SELECT * FROM mytable WHERE (1) AND (mycol IS NOT NULL) AND (mycol = ?)",
+            (string) $query
+        );
+
+        $query->reset()
+            ->from("mytable")
+            ->where("mycol = :color", ["color" => "blue"]);
+        $this->assertEquals(
+            "SELECT * FROM mytable WHERE (mycol = :color)",
             (string) $query
         );
     }
