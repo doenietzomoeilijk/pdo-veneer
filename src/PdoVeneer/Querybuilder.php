@@ -187,14 +187,17 @@ class Querybuilder
         }
 
         $this->parts["where"][] = "($where)";
+
         return $this;
     }
 
     /**
+     * @param string|array $groups
      * @return PdoVeneer\Querybuilder $this
      */
-    public function groupBy($groups)
+    public function group($groups)
     {
+        $this->addGeneric("group", $groups);
         return $this;
     }
 
@@ -235,9 +238,11 @@ class Querybuilder
         }
 
         if (!empty($this->parts["where"])) {
-
             $query[] = "WHERE " . implode(" AND ", $this->parts["where"]);
+        }
 
+        if (!empty($this->parts["group"])) {
+            $query[] = "GROUP BY " . implode(", ", $this->parts["group"]);
         }
 
         return implode(" ", $query);
