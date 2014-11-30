@@ -90,6 +90,23 @@ class Querybuilder
     }
 
     /**
+     * Overwrite a generic.
+     *
+     * @param string $type one of the keys in the $parts array
+     * @param string $toAdd string of one field to set
+     * @param string $alias
+     * @return void
+     */
+    private function setGeneric($type, $toSet, $alias = null)
+    {
+        if ($alias !== null && !is_int($alias)) {
+            $toSet .= " AS $alias";
+        }
+
+        $this->parts[$type] = $toSet;
+    }
+
+    /**
      * Actually add the join.
      *
      * @param string $type
@@ -202,10 +219,24 @@ class Querybuilder
     }
 
     /**
+     * Can be specified as one of:
+     *
+     * * limit(10) -- to set a single, integer limit
+     * * limit([10, 10]) -- to set a limit, offset
+     * * limit("10, 10") -- to set the same limit as a string
+     *
+     * @param string|integer|array $limit
      * @return PdoVeneer\Querybuilder $this
      */
-    public function limit($groups)
+    public function limit($limit)
     {
+        // assume that any array is a limit + offset
+        if (is_array($limit)) {
+            list($limit, $offset) = $limit;
+            $limit = "$limit OFFSET $offset";
+        }
+
+        $this->setGeneric("limit", $limit);
         return $this;
     }
 
@@ -243,6 +274,10 @@ class Querybuilder
 
         if (!empty($this->parts["group"])) {
             $query[] = "GROUP BY " . implode(", ", $this->parts["group"]);
+        }
+
+        if (!empty($this->parts["limit"])) {
+            $query[] = "LIMIT {$this->parts['limit']}";
         }
 
         return implode(" ", $query);

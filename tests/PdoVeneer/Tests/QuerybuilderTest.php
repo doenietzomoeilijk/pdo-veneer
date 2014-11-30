@@ -139,4 +139,35 @@ class QuerybuilderTest extends \PHPUnit_Framework_TestCase
             (string) $query
         );
     }
+
+    public function testLimit()
+    {
+        $query = new Querybuilder;
+
+        $query->from("myTable")
+            ->limit(10);
+        $this->assertEquals(
+            "SELECT * FROM myTable LIMIT 10",
+            (string) $query
+        );
+
+        $query->limit([10, 10]);
+        $this->assertEquals(
+            "SELECT * FROM myTable LIMIT 10 OFFSET 10",
+            (string) $query
+        );
+
+        $query->limit("10, 10");
+        $this->assertEquals(
+            "SELECT * FROM myTable LIMIT 10, 10",
+            (string) $query
+        );
+
+        // Reset the limit
+        $query->limit(null);
+        $this->assertEquals(
+            "SELECT * FROM myTable",
+            (string) $query
+        );
+    }
 }
