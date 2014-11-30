@@ -32,22 +32,22 @@ class QuerybuilderTest extends \PHPUnit_Framework_TestCase
         $query = new Querybuilder;
 
         // Simple from.
-        $query->from("mytable");
-        $this->assertEquals("SELECT * FROM mytable", (string) $query);
+        $query->from("myTable");
+        $this->assertEquals("SELECT * FROM myTable", (string) $query);
 
         // From with alias.
         $query->reset()
-            ->from("mytable", "m");
-        $this->assertEquals("SELECT * FROM mytable AS m", (string) $query);
+            ->from("myTable", "m");
+        $this->assertEquals("SELECT * FROM myTable AS m", (string) $query);
 
         // Multiple FROMs in one go.
         $query->reset()
-            ->from(["mytable", "myothertable"]);
-        $this->assertEquals("SELECT * FROM mytable, myothertable", (string) $query);
+            ->from(["myTable", "myothertable"]);
+        $this->assertEquals("SELECT * FROM myTable, myothertable", (string) $query);
 
         $query->reset()
-            ->from(["m" => "mytable", "o" => "myothertable"]);
-        $this->assertEquals("SELECT * FROM mytable AS m, myothertable AS o", (string) $query);
+            ->from(["m" => "myTable", "o" => "myothertable"]);
+        $this->assertEquals("SELECT * FROM myTable AS m, myothertable AS o", (string) $query);
     }
 
     public function testJoins()
@@ -88,30 +88,54 @@ class QuerybuilderTest extends \PHPUnit_Framework_TestCase
     {
         $query = new Querybuilder;
 
-        $query->from("mytable")
+        $query->from("myTable")
             ->where("1");
         $this->assertEquals(
-            "SELECT * FROM mytable WHERE (1)",
+            "SELECT * FROM myTable WHERE (1)",
             (string) $query
         );
 
-        $query->where("mycol IS NOT NULL");
+        $query->where("myCol IS NOT NULL");
         $this->assertEquals(
-            "SELECT * FROM mytable WHERE (1) AND (mycol IS NOT NULL)",
+            "SELECT * FROM myTable WHERE (1) AND (myCol IS NOT NULL)",
             (string) $query
         );
 
-        $query->where("mycol = ?", [1]);
+        $query->where("myCol = ?", [1]);
         $this->assertEquals(
-            "SELECT * FROM mytable WHERE (1) AND (mycol IS NOT NULL) AND (mycol = ?)",
+            "SELECT * FROM myTable WHERE (1) AND (myCol IS NOT NULL) AND (myCol = ?)",
             (string) $query
         );
 
         $query->reset()
-            ->from("mytable")
-            ->where("mycol = :color", ["color" => "blue"]);
+            ->from("myTable")
+            ->where("myCol = :color", ["color" => "blue"]);
         $this->assertEquals(
-            "SELECT * FROM mytable WHERE (mycol = :color)",
+            "SELECT * FROM myTable WHERE (myCol = :color)",
+            (string) $query
+        );
+    }
+
+    public function testGroup()
+    {
+        $query = new Querybuilder;
+
+        $query->from("myTable")
+            ->group("myCol");
+        $this->assertEquals(
+            "SELECT * FROM myTable GROUP BY myCol",
+            (string) $query
+        );
+
+        $query->group("myOtherCol");
+        $this->assertEquals(
+            "SELECT * FROM myTable GROUP BY myCol, myOtherCol",
+            (string) $query
+        );
+
+        $query->group(["col1 ASC", "col2"]);
+        $this->assertEquals(
+            "SELECT * FROM myTable GROUP BY myCol, myOtherCol, col1 ASC, col2",
             (string) $query
         );
     }
