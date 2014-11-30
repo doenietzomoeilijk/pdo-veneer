@@ -1,9 +1,6 @@
 <?php
 /**
- * The query builder
- *
- * @copyright
- * @author Max Roeleveld
+ * The query builder.
  */
 
 namespace Dnzm\PdoVeneer;
@@ -134,9 +131,12 @@ class Querybuilder
     /**
      * @return PdoVeneer\Querybuilder $this
      */
-    public function select($select, $alias = null)
+    public function select($select = null, $alias = null)
     {
-        $this->addGeneric("select", $select, $alias);
+        if ($select !== null) {
+            $this->addGeneric("select", $select, $alias);
+        }
+
         return $this;
     }
 
@@ -238,6 +238,16 @@ class Querybuilder
 
         $this->setGeneric("limit", $limit);
         return $this;
+    }
+
+    /**
+     * Returns the parameters that were set.
+     *
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
     }
 
     /**
